@@ -1,0 +1,20 @@
+This package solves the problem of turning off inlining
+when compiling a Common Lisp system.   To use it, wrap
+the macro DISABLE-INLINE:WITH-NO-INLINE around the
+compilation:
+
+(disable-inline:with-no-inline (ql:quickload <system>))
+
+Inside the dynamic environment created by this macro,
+any DEFPACKAGE form is modified (via a macroexpand hook)
+to shadow INLINE with a symbol of that is a meaningless
+but valid declaration.
+
+The main purpose of this is to compile public Common Lisp
+systems so the coverage of their test suites can be measured
+using sbcl's sb-cover package.   This will still not handle
+coverage of defmacros; for that systems should move their
+macros to separate files from the ones they are used in.
+Even that will not handle coverage of the code expanded
+from uses of these macros; for that, Waters' COVER package
+is recommended.
