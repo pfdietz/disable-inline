@@ -7,7 +7,7 @@ compilation:
 
 Inside the dynamic environment created by this macro,
 any DEFPACKAGE form is modified (via a macroexpand hook)
-to shadow INLINE with a symbol of that is a meaningless
+to shadow INLINE with a symbol that is a meaningless
 but valid declaration.
 
 The main purpose of this is to compile public Common Lisp
