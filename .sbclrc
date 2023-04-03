@@ -1,0 +1,68 @@
+;;; -*- Mode: Lisp; Package: CL-USER; Syntax: ANSI-Common-Lisp -*-
+(load "~/quicklisp/setup.lisp")
+
+(push :spec-map-dev *features*)
+
+#+sbcl
+(defun opt-off ()
+  (sb-ext:restrict-compiler-policy 'safety 3)
+  (sb-ext:restrict-compiler-policy 'speed 0 0)
+  (sb-ext:restrict-compiler-policy 'space 3 3))
+
+(defun add-lisp-mutation ()
+  (push #p"/pdietz/lisp-mutation/" ql:*local-project-directories*)
+  (ql:register-local-projects))
+
+(defun qlselnc ()
+  (ql:quickload :software-evolution-library/software/new-clang
+                :verbose t))
+
+(defun qlsel ()
+  (ql:quickload :software-evolution-library/test)
+;;  (ql:quickload :software-evolution-library/test/new-clang-debug)
+;;  (ql:quickload :software-evolution-library/test/clang-diff-test)
+;;  (load "/pdietz/quicklisp/local-projects/personal-scripts/stefil-more.lisp")
+  ;;  (load "/pdietz/quicklisp/local-projects/personal-scripts/nc-unit-testing.lisp"
+  )
+
+(defun qlrslv ()
+  (ql:quickload :resolve/test)
+  (load "/pdietz/quicklisp/local-projects/personal-scripts/stefil-more.lisp")
+  (load "/pdietz/quicklisp/local-projects/personal-scripts/resolve.lisp"))
+
+(require :sb-cover)
+
+(defun cover-on ()
+  (eval '(declaim (optimize sb-cover:store-coverage-data))))
+
+(defun cover-off ()
+  (eval '(declaim (optimize (sb-cover:store-coverage-data 0)))))
+
+(defun qlql (&rest args)
+  (apply #'ql:quickload args))
+
+(defun q (&rest args)
+  (apply #'ql:quickload args))
+
+(defun qimp ()
+  (shadowing-import '(q qlql qlcov) *package*))
+
+(defun qlcov (&rest args)
+  (qlql :disable-inline)
+  (eval `(,(intern "WITH-NO-INLINE" :disable-inline)
+           (cover-on)
+           (qlql ,@args)
+          (cover-off))))
+
+(defun qlclean ()
+  (map nil 'ql-dist:clean (ql-dist:all-dists)))
+
+(defun qlupdate ()
+  (ql:update-dist "quicklisp"))
+
+;;; The following lines added by ql:add-to-init-file:
+#-quicklisp
+(let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
+                                       (user-homedir-pathname))))
+  (when (probe-file quicklisp-init)
+    (load quicklisp-init)))
